@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
+import { ApolloWrapper } from "@/lib/apollo-wrapper";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,13 +26,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} flex min-h-screen flex-col antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} flex min-h-screen flex-col bg-[#0d0d1a] text-white antialiased`}
       >
-        <Header />
-        <main className="flex-1">{children}</main>
-        <Footer />
+        <ApolloWrapper>
+          <Header />
+          <main className="flex-1">{children}</main>
+          <Footer />
+        </ApolloWrapper>
       </body>
     </html>
   );

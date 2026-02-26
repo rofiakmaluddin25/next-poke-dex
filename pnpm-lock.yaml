@@ -11,7 +11,7 @@ importers:
       '@apollo/client':
         specifier: ^4.1.6
         version: 4.1.6(graphql@16.13.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(rxjs@7.8.2)
-      '@apollo/experimental-nextjs-app-support':
+      '@apollo/client-integration-nextjs':
         specifier: ^0.14.4
         version: 0.14.4(@apollo/client@4.1.6(graphql@16.13.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(rxjs@7.8.2))(@types/react@19.2.14)(graphql@16.13.0)(next@16.1.6(@babel/core@7.29.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(rxjs@7.8.2)
       class-variance-authority:
@@ -139,14 +139,6 @@ packages:
         optional: true
       subscriptions-transport-ws:
         optional: true
-
-  '@apollo/experimental-nextjs-app-support@0.14.4':
-    resolution: {integrity: sha512-EzgqeCg9KLGFWkKPgTORyaruVL4dSIJ3yUAEUJiyqB4Sx3d3NF7XKYZhfvDD5TAVvN9lqoUJyZE2xFXFJ0/9rQ==}
-    peerDependencies:
-      '@apollo/client': ^4.0.0
-      next: ^15.2.3
-      react: ^19
-      rxjs: ^7.3.0
 
   '@babel/code-frame@7.29.0':
     resolution: {integrity: sha512-9NhCeYjq9+3uxgdtp20LSiJXJvN0FeCtNGpJxuMFZ1Kv3cWUNb6DOhJwUvcVCzKGR66cw4njwM6hrJLqgOwbcw==}
@@ -4158,18 +4150,6 @@ snapshots:
     optionalDependencies:
       react: 19.2.3
       react-dom: 19.2.3(react@19.2.3)
-
-  '@apollo/experimental-nextjs-app-support@0.14.4(@apollo/client@4.1.6(graphql@16.13.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(rxjs@7.8.2))(@types/react@19.2.14)(graphql@16.13.0)(next@16.1.6(@babel/core@7.29.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(rxjs@7.8.2)':
-    dependencies:
-      '@apollo/client': 4.1.6(graphql@16.13.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(rxjs@7.8.2)
-      '@apollo/client-integration-nextjs': 0.14.4(@apollo/client@4.1.6(graphql@16.13.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(rxjs@7.8.2))(@types/react@19.2.14)(graphql@16.13.0)(next@16.1.6(@babel/core@7.29.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(rxjs@7.8.2)
-      next: 16.1.6(@babel/core@7.29.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
-      react: 19.2.3
-      rxjs: 7.8.2
-    transitivePeerDependencies:
-      - '@types/react'
-      - graphql
-      - react-dom
 
   '@babel/code-frame@7.29.0':
     dependencies:
