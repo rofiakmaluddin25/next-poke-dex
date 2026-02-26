@@ -18,15 +18,12 @@ function getPageRange(current: number, total: number): (number | "...")[] {
   if (total <= 7) {
     return Array.from({ length: total }, (_, i) => i + 1);
   }
-
   if (current <= 4) {
     return [1, 2, 3, 4, 5, "...", total];
   }
-
   if (current >= total - 3) {
     return [1, "...", total - 4, total - 3, total - 2, total - 1, total];
   }
-
   return [1, "...", current - 1, current, current + 1, "...", total];
 }
 
@@ -38,7 +35,6 @@ export default function PokemonPagination({
   if (totalPages <= 1) return null;
 
   const pageHref = (page: number) => `${basePath}?page=${page}`;
-
   const pages = getPageRange(currentPage, totalPages);
 
   return (
@@ -50,9 +46,7 @@ export default function PokemonPagination({
             href={currentPage > 1 ? pageHref(currentPage - 1) : "#"}
             aria-disabled={currentPage === 1}
             className={
-              currentPage === 1
-                ? "pointer-events-none opacity-40"
-                : "text-white hover:bg-white/10 hover:text-white"
+              currentPage === 1 ? "pointer-events-none opacity-40" : ""
             }
           />
         </PaginationItem>
@@ -61,7 +55,7 @@ export default function PokemonPagination({
         {pages.map((page, i) =>
           page === "..." ? (
             <PaginationItem key={`ellipsis-${i}`}>
-              <PaginationEllipsis className="text-gray-400" />
+              <PaginationEllipsis />
             </PaginationItem>
           ) : (
             <PaginationItem key={page}>
@@ -70,8 +64,8 @@ export default function PokemonPagination({
                 isActive={page === currentPage}
                 className={
                   page === currentPage
-                    ? "border-blue-500 bg-blue-600 text-white hover:bg-blue-600"
-                    : "border-transparent text-gray-300 hover:bg-white/10 hover:text-white"
+                    ? "border-blue-500 bg-blue-600 text-white hover:bg-blue-500 hover:text-white"
+                    : ""
                 }
               >
                 {page}
@@ -86,9 +80,7 @@ export default function PokemonPagination({
             href={currentPage < totalPages ? pageHref(currentPage + 1) : "#"}
             aria-disabled={currentPage === totalPages}
             className={
-              currentPage === totalPages
-                ? "pointer-events-none opacity-40"
-                : "text-white hover:bg-white/10 hover:text-white"
+              currentPage === totalPages ? "pointer-events-none opacity-40" : ""
             }
           />
         </PaginationItem>
