@@ -51,9 +51,9 @@ export default function PokemonCard({
   const formattedId = `#${String(id).padStart(3, "0")}`;
 
   const card = (
-    <div className="group flex flex-col gap-3 rounded-2xl bg-[#1e2b1e] p-3 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/40">
+    <div className="group flex flex-col gap-3 rounded-2xl bg-[#1a1a2e] p-3 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/40">
       {/* Image */}
-      <div className="relative aspect-square overflow-hidden rounded-xl bg-[#162016]">
+      <div className="relative aspect-square overflow-hidden rounded-xl bg-[#13132b]">
         <span className="absolute top-2 right-2 z-10 text-[11px] font-medium text-white/50 select-none">
           {formattedId}
         </span>
