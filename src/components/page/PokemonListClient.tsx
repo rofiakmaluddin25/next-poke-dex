@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useQuery } from "@apollo/client/react";
-import { Search, X } from "lucide-react";
+import { Search, X, ArrowUpDown } from "lucide-react";
 import { GET_POKEMON_LIST } from "@/graphql/queries/getPokemonList";
 import type {
   GetPokemonListData,
@@ -58,6 +58,16 @@ const TYPE_PILL_STYLE: Record<PokemonTypeName, { bg: string; text: string }> = {
   fairy: { bg: "#EE99AC", text: "#3a0020" },
 };
 
+const SORT_OPTIONS: Record<
+  string,
+  { label: string; value: Record<string, "asc" | "desc">[] }
+> = {
+  "id-asc": { label: "#: Low → High", value: [{ id: "asc" }] },
+  "id-desc": { label: "#: High → Low", value: [{ id: "desc" }] },
+  "name-asc": { label: "Name: A → Z", value: [{ name: "asc" }] },
+  "name-desc": { label: "Name: Z → A", value: [{ name: "desc" }] },
+};
+
 function useDebounce(value: string, delay: number) {
   const [debounced, setDebounced] = useState(value);
   useEffect(() => {
@@ -73,6 +83,7 @@ export default function PokemonListClient() {
   const [selectedType, setSelectedType] = useState<PokemonTypeName | null>(
     null,
   );
+  const [sortOrder, setSortOrder] = useState<string>("id-asc");
   const debouncedSearch = useDebounce(searchInput, 400);
 
   const nameVar = debouncedSearch ? `%${debouncedSearch}%` : "%";
@@ -87,6 +98,7 @@ export default function PokemonListClient() {
         offset,
         name: nameVar,
         type: typeVar,
+        order_by: SORT_OPTIONS[sortOrder].value,
       },
     },
   );
@@ -107,34 +119,75 @@ export default function PokemonListClient() {
     setCurrentPage(1);
   };
 
-  const hasActiveFilter = !!selectedType || !!debouncedSearch;
+  const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSortOrder(e.target.value);
+    setCurrentPage(1);
+  };
+
+  const hasActiveFilter =
+    !!selectedType || !!debouncedSearch || sortOrder !== "id-asc";
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      {/* Search bar */}
-      <div className="relative mx-auto mb-6 max-w-md">
-        <Search
-          className="pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-white/40"
-          aria-hidden="true"
-        />
-        <input
-          id="pokemon-search"
-          type="search"
-          value={searchInput}
-          onChange={handleSearchChange}
-          placeholder="Search Pokémon by name…"
-          aria-label="Search Pokémon by name"
-          className="w-full rounded-xl border border-white/10 bg-white/5 py-2.5 pr-10 pl-10 text-sm text-white placeholder-white/30 transition-all duration-200 outline-none focus:border-blue-500/60 focus:bg-white/8 focus:ring-2 focus:ring-blue-500/20"
-        />
-        {searchInput && (
-          <button
-            onClick={handleClear}
-            aria-label="Clear search"
-            className="absolute top-1/2 right-3 -translate-y-1/2 rounded p-0.5 text-white/40 transition hover:text-white"
+      <div className="mx-auto mb-6 flex max-w-2xl flex-col gap-4 sm:flex-row sm:items-center">
+        <div className="relative flex-1">
+          <Search
+            className="pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-white/40"
+            aria-hidden="true"
+          />
+          <input
+            id="pokemon-search"
+            type="search"
+            value={searchInput}
+            onChange={handleSearchChange}
+            placeholder="Search Pokémon by name…"
+            aria-label="Search Pokémon by name"
+            className="w-full rounded-xl border border-white/10 bg-white/5 py-2.5 pr-10 pl-10 text-sm text-white placeholder-white/30 transition-all duration-200 outline-none focus:border-blue-500/60 focus:bg-white/8 focus:ring-2 focus:ring-blue-500/20"
+          />
+          {searchInput && (
+            <button
+              onClick={handleClear}
+              aria-label="Clear search"
+              className="absolute top-1/2 right-3 -translate-y-1/2 rounded p-0.5 text-white/40 transition hover:text-white"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
+        </div>
+
+        <div className="relative shrink-0 sm:w-48">
+          <ArrowUpDown
+            className="pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-white/40"
+            aria-hidden="true"
+          />
+          <select
+            value={sortOrder}
+            onChange={handleSortChange}
+            aria-label="Sort Pokémon"
+            className="w-full appearance-none rounded-xl border border-white/10 bg-white/5 py-2.5 pr-10 pl-10 text-sm text-white transition-all duration-200 outline-none focus:border-blue-500/60 focus:bg-white/8 focus:ring-2 focus:ring-blue-500/20"
           >
-            <X className="h-4 w-4" />
-          </button>
-        )}
+            {Object.entries(SORT_OPTIONS).map(([key, { label }]) => (
+              <option key={key} value={key} className="bg-[#1a1a2e] text-white">
+                {label}
+              </option>
+            ))}
+          </select>
+          <div className="pointer-events-none absolute top-1/2 right-3.5 flex -translate-y-1/2 items-center text-white/40">
+            <svg
+              className="h-4 w-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </div>
+        </div>
       </div>
 
       <div className="mb-6">
@@ -188,6 +241,7 @@ export default function PokemonListClient() {
               onClick={() => {
                 setSelectedType(null);
                 setSearchInput("");
+                setSortOrder("id-asc");
                 setCurrentPage(1);
               }}
               className="text-xs text-white/30 underline underline-offset-2 transition hover:text-white/70"

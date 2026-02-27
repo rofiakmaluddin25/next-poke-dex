@@ -6,11 +6,12 @@ export const GET_POKEMON_LIST = gql`
     $offset: Int = 0
     $name: String = "%"
     $type: String = "%"
+    $order_by: [pokemon_v2_pokemon_order_by!] = [{ id: asc }]
   ) {
     pokemon_v2_pokemon(
       limit: $limit
       offset: $offset
-      order_by: { id: asc }
+      order_by: $order_by
       where: {
         name: { _ilike: $name }
         pokemon_v2_pokemontypes: {

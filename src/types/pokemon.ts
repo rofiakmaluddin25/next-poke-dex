@@ -68,6 +68,7 @@ export interface GetPokemonListVars {
   offset?: number;
   name?: string;
   type?: string;
+  order_by?: Record<string, "asc" | "desc">[];
 }
 
 export function toPokemonCardData(pokemon: GqlPokemon): PokemonCardData {
