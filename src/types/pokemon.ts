@@ -66,6 +66,7 @@ export interface GetPokemonListData {
 export interface GetPokemonListVars {
   limit?: number;
   offset?: number;
+  name?: string;
 }
 
 export function toPokemonCardData(pokemon: GqlPokemon): PokemonCardData {
