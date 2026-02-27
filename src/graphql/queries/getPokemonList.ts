@@ -5,12 +5,18 @@ export const GET_POKEMON_LIST = gql`
     $limit: Int = 10
     $offset: Int = 0
     $name: String = "%"
+    $type: String = "%"
   ) {
     pokemon_v2_pokemon(
       limit: $limit
       offset: $offset
       order_by: { id: asc }
-      where: { name: { _ilike: $name } }
+      where: {
+        name: { _ilike: $name }
+        pokemon_v2_pokemontypes: {
+          pokemon_v2_type: { name: { _ilike: $type } }
+        }
+      }
     ) {
       id
       name
@@ -23,7 +29,14 @@ export const GET_POKEMON_LIST = gql`
         sprites
       }
     }
-    pokemon_v2_pokemon_aggregate(where: { name: { _ilike: $name } }) {
+    pokemon_v2_pokemon_aggregate(
+      where: {
+        name: { _ilike: $name }
+        pokemon_v2_pokemontypes: {
+          pokemon_v2_type: { name: { _ilike: $type } }
+        }
+      }
+    ) {
       aggregate {
         count
       }
