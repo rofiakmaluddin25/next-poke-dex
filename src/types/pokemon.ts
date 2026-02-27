@@ -18,17 +18,12 @@ export type PokemonTypeName =
   | "steel"
   | "fairy";
 
-// ── UI / component shape ──────────────────────────────────────────────────────
-
 export interface PokemonCardData {
   id: number;
   name: string;
   image: string;
   types: PokemonTypeName[];
 }
-
-// ── Raw GraphQL response shapes ───────────────────────────────────────────────
-// These mirror the exact JSON returned by the PokeAPI v1beta GraphQL endpoint.
 
 interface PokemonSprites {
   other: {
@@ -73,9 +68,6 @@ export interface GetPokemonListVars {
   offset?: number;
 }
 
-// ── Transformer ───────────────────────────────────────────────────────────────
-// Converts a raw GqlPokemon into the clean PokemonCardData used by the UI.
-
 export function toPokemonCardData(pokemon: GqlPokemon): PokemonCardData {
   const sprites = pokemon.pokemon_v2_pokemonsprites[0]?.sprites;
   const image =
@@ -89,4 +81,62 @@ export function toPokemonCardData(pokemon: GqlPokemon): PokemonCardData {
     image,
     types: pokemon.pokemon_v2_pokemontypes.map((t) => t.pokemon_v2_type.name),
   };
+}
+
+export interface GqlPokemonStat {
+  base_stat: number;
+  pokemon_v2_stat: {
+    name: string;
+  };
+}
+
+export interface GqlPokemonAbility {
+  is_hidden: boolean;
+  pokemon_v2_ability: {
+    name: string;
+  };
+}
+
+export interface GqlEvolutionSpecies {
+  id: number;
+  name: string;
+  evolves_from_species_id: number | null;
+  pokemon_v2_pokemonevolutions: { min_level: number | null }[];
+}
+
+export interface GqlPokemonDetail {
+  id: number;
+  name: string;
+  height: number;
+  weight: number;
+  pokemon_v2_pokemontypes: {
+    pokemon_v2_type: { name: PokemonTypeName };
+  }[];
+  pokemon_v2_pokemonsprites: { sprites: PokemonSprites }[];
+  pokemon_v2_pokemonstats: GqlPokemonStat[];
+  pokemon_v2_pokemonabilities: GqlPokemonAbility[];
+  pokemon_v2_pokemonspecy: {
+    capture_rate: number;
+    base_happiness: number;
+    pokemon_v2_pokemonspeciesflavortexts: { flavor_text: string }[];
+    pokemon_v2_pokemonspeciesnames: { genus: string }[];
+    pokemon_v2_evolutionchain: {
+      pokemon_v2_pokemonspecies: GqlEvolutionSpecies[];
+    };
+  } | null;
+}
+
+export interface GqlTypeEfficacy {
+  damage_factor: number;
+  pokemon_v2_type: { name: PokemonTypeName };
+  pokemonV2TypeByTargetTypeId: { name: PokemonTypeName };
+}
+
+export interface GetPokemonDetailData {
+  pokemon_v2_pokemon: GqlPokemonDetail[];
+  pokemon_v2_typeefficacy: GqlTypeEfficacy[];
+}
+
+export interface GetPokemonDetailVars {
+  id: number;
 }
