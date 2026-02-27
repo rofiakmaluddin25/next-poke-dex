@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { useQuery } from "@apollo/client/react";
 import { Search, X, ArrowUpDown } from "lucide-react";
 import { GET_POKEMON_LIST } from "@/graphql/queries/getPokemonList";
@@ -84,6 +85,8 @@ export default function PokemonListClient() {
     null,
   );
   const [sortOrder, setSortOrder] = useState<string>("id-asc");
+  const [isCompareMode, setIsCompareMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const debouncedSearch = useDebounce(searchInput, 400);
 
   const nameVar = debouncedSearch ? `%${debouncedSearch}%` : "%";
@@ -124,6 +127,25 @@ export default function PokemonListClient() {
     setCurrentPage(1);
   };
 
+  const handleToggleCompareMode = () => {
+    setIsCompareMode(!isCompareMode);
+    if (isCompareMode) {
+      setSelectedIds([]);
+    }
+  };
+
+  const handleCardToggle = (id: number) => {
+    setSelectedIds((prev) => {
+      if (prev.includes(id)) {
+        return prev.filter((p) => p !== id);
+      }
+      if (prev.length >= 2) {
+        return [prev[1], id];
+      }
+      return [...prev, id];
+    });
+  };
+
   const hasActiveFilter =
     !!selectedType || !!debouncedSearch || sortOrder !== "id-asc";
 
@@ -155,38 +177,55 @@ export default function PokemonListClient() {
           )}
         </div>
 
-        <div className="relative shrink-0 sm:w-48">
-          <ArrowUpDown
-            className="pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-white/40"
-            aria-hidden="true"
-          />
-          <select
-            value={sortOrder}
-            onChange={handleSortChange}
-            aria-label="Sort Pokémon"
-            className="w-full appearance-none rounded-xl border border-white/10 bg-white/5 py-2.5 pr-10 pl-10 text-sm text-white transition-all duration-200 outline-none focus:border-blue-500/60 focus:bg-white/8 focus:ring-2 focus:ring-blue-500/20"
-          >
-            {Object.entries(SORT_OPTIONS).map(([key, { label }]) => (
-              <option key={key} value={key} className="bg-[#1a1a2e] text-white">
-                {label}
-              </option>
-            ))}
-          </select>
-          <div className="pointer-events-none absolute top-1/2 right-3.5 flex -translate-y-1/2 items-center text-white/40">
-            <svg
-              className="h-4 w-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+        <div className="flex shrink-0 gap-3 sm:w-auto">
+          <div className="relative w-full sm:w-48">
+            <ArrowUpDown
+              className="pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-white/40"
+              aria-hidden="true"
+            />
+            <select
+              value={sortOrder}
+              onChange={handleSortChange}
+              aria-label="Sort Pokémon"
+              className="w-full appearance-none rounded-xl border border-white/10 bg-white/5 py-2.5 pr-10 pl-10 text-sm text-white transition-all duration-200 outline-none focus:border-blue-500/60 focus:bg-white/8 focus:ring-2 focus:ring-blue-500/20"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M19 9l-7 7-7-7"
-              />
-            </svg>
+              {Object.entries(SORT_OPTIONS).map(([key, { label }]) => (
+                <option
+                  key={key}
+                  value={key}
+                  className="bg-[#1a1a2e] text-white"
+                >
+                  {label}
+                </option>
+              ))}
+            </select>
+            <div className="pointer-events-none absolute top-1/2 right-3.5 flex -translate-y-1/2 items-center text-white/40">
+              <svg
+                className="h-4 w-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </div>
           </div>
+
+          <button
+            onClick={handleToggleCompareMode}
+            className={`flex shrink-0 items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition-all duration-200 ${
+              isCompareMode
+                ? "bg-blue-600 text-white hover:bg-blue-700"
+                : "border border-white/10 bg-white/5 text-white/70 hover:bg-white/10 hover:text-white"
+            }`}
+          >
+            {isCompareMode ? "Done" : "Compare"}
+          </button>
         </div>
       </div>
 
@@ -261,7 +300,10 @@ export default function PokemonListClient() {
               <PokemonCard
                 key={pokemon.id}
                 {...pokemon}
-                href={`/pokemon/${pokemon.id}`}
+                href={isCompareMode ? undefined : `/pokemon/${pokemon.id}`}
+                selectable={isCompareMode}
+                selected={selectedIds.includes(pokemon.id)}
+                onToggle={() => handleCardToggle(pokemon.id)}
               />
             ))}
       </div>
@@ -283,6 +325,52 @@ export default function PokemonListClient() {
         totalPages={totalPages}
         onPageChange={setCurrentPage}
       />
+
+      {isCompareMode && selectedIds.length > 0 && (
+        <div className="fixed bottom-6 left-1/2 z-50 flex w-full max-w-md -translate-x-1/2 items-center justify-between rounded-2xl border border-white/10 bg-[#1a1a2e]/95 p-4 shadow-2xl shadow-black/50 backdrop-blur-md">
+          <div className="flex items-center gap-3">
+            <div className="text-sm font-medium text-white/50">
+              <span className="text-white">{selectedIds.length}</span>/2
+            </div>
+            <div className="flex gap-2">
+              {Array.from({ length: 2 }).map((_, i) => (
+                <div
+                  key={i}
+                  className={`h-10 w-10 rounded-full border-2 ${
+                    selectedIds[i]
+                      ? "border-blue-500 bg-blue-500/20"
+                      : "border-white/10 bg-white/5"
+                  } flex items-center justify-center`}
+                >
+                  {selectedIds[i] && (
+                    <span className="text-[10px] text-white">
+                      #{selectedIds[i]}
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <Link
+            href={
+              selectedIds.length === 2
+                ? `/compare?p1=${selectedIds[0]}&p2=${selectedIds[1]}`
+                : "#"
+            }
+            className={`rounded-xl px-6 py-2.5 text-sm font-bold transition-all duration-200 ${
+              selectedIds.length === 2
+                ? "bg-blue-600 text-white shadow-lg shadow-blue-500/25 hover:bg-blue-500"
+                : "cursor-not-allowed bg-white/10 text-white/40"
+            }`}
+            onClick={(e) => {
+              if (selectedIds.length !== 2) e.preventDefault();
+            }}
+          >
+            Compare Now
+          </Link>
+        </div>
+      )}
     </div>
   );
 }
