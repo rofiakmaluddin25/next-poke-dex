@@ -12,6 +12,7 @@ interface PokemonPaginationProps {
   currentPage: number;
   totalPages: number;
   basePath?: string;
+  onPageChange?: (page: number) => void;
 }
 
 function getPageRange(current: number, total: number): (number | "...")[] {
@@ -31,10 +32,21 @@ export default function PokemonPagination({
   currentPage,
   totalPages,
   basePath = "/",
+  onPageChange,
 }: PokemonPaginationProps) {
   if (totalPages <= 1) return null;
 
-  const pageHref = (page: number) => `${basePath}?page=${page}`;
+  const pageHref = (page: number) =>
+    onPageChange ? "#" : `${basePath}?page=${page}`;
+
+  const handleClick =
+    (page: number) => (e: React.MouseEvent<HTMLAnchorElement>) => {
+      if (onPageChange) {
+        e.preventDefault();
+        onPageChange(page);
+      }
+    };
+
   const pages = getPageRange(currentPage, totalPages);
 
   return (
@@ -44,6 +56,7 @@ export default function PokemonPagination({
         <PaginationItem>
           <PaginationPrevious
             href={currentPage > 1 ? pageHref(currentPage - 1) : "#"}
+            onClick={handleClick(currentPage - 1)}
             aria-disabled={currentPage === 1}
             className={
               currentPage === 1 ? "pointer-events-none opacity-40" : ""
@@ -61,6 +74,7 @@ export default function PokemonPagination({
             <PaginationItem key={page}>
               <PaginationLink
                 href={pageHref(page)}
+                onClick={handleClick(page)}
                 isActive={page === currentPage}
                 className={
                   page === currentPage
@@ -78,6 +92,7 @@ export default function PokemonPagination({
         <PaginationItem>
           <PaginationNext
             href={currentPage < totalPages ? pageHref(currentPage + 1) : "#"}
+            onClick={handleClick(currentPage + 1)}
             aria-disabled={currentPage === totalPages}
             className={
               currentPage === totalPages ? "pointer-events-none opacity-40" : ""
