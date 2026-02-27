@@ -210,15 +210,6 @@ export default function PokemonDetailView({ pokemon, typeEfficacy }: Props) {
                 ))}
               </div>
             </div>
-
-            <div className="flex justify-center gap-3">
-              <button className="flex items-center gap-2 rounded-full bg-yellow-500/20 px-5 py-2 text-sm font-semibold text-yellow-400 transition hover:bg-yellow-500/30">
-                <span>♥</span> Add to Team
-              </button>
-              <button className="flex items-center gap-2 rounded-full bg-white/10 px-5 py-2 text-sm font-semibold text-white/70 transition hover:bg-white/15">
-                <span>↗</span> Share
-              </button>
-            </div>
           </div>
 
           <div className="flex flex-col gap-6">
