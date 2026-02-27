@@ -1,3 +1,4 @@
+import { memo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -44,9 +45,10 @@ interface PokemonCardProps extends PokemonCardData {
   selectable?: boolean;
   selected?: boolean;
   onToggle?: () => void;
+  priority?: boolean;
 }
 
-export default function PokemonCard({
+function PokemonCard({
   id,
   name,
   image,
@@ -55,6 +57,7 @@ export default function PokemonCard({
   selectable,
   selected,
   onToggle,
+  priority = false,
 }: PokemonCardProps) {
   const formattedId = `#${String(id).padStart(3, "0")}`;
 
@@ -90,6 +93,7 @@ export default function PokemonCard({
           src={image}
           alt={name}
           fill
+          priority={priority}
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
           className={cn(
             "object-contain p-2 drop-shadow-lg transition-transform duration-300 group-hover:scale-105",
@@ -134,3 +138,5 @@ export default function PokemonCard({
 
   return card;
 }
+
+export default memo(PokemonCard);

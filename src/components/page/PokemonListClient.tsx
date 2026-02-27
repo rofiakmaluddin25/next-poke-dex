@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useQuery } from "@apollo/client/react";
 import { Search, X, ArrowUpDown } from "lucide-react";
@@ -110,31 +110,39 @@ export default function PokemonListClient() {
   const totalCount = data?.pokemon_v2_pokemon_aggregate.aggregate.count ?? 0;
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
 
-  const handleClear = () => setSearchInput("");
+  const handleClear = useCallback(() => setSearchInput(""), []);
 
-  const handleTypeToggle = (type: PokemonTypeName) => {
+  const handleTypeToggle = useCallback((type: PokemonTypeName) => {
     setSelectedType((prev) => (prev === type ? null : type));
     setCurrentPage(1);
-  };
+  }, []);
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchInput(e.target.value);
-    setCurrentPage(1);
-  };
+  const handleSearchChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setSearchInput(e.target.value);
+      setCurrentPage(1);
+    },
+    [],
+  );
 
-  const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSortOrder(e.target.value);
-    setCurrentPage(1);
-  };
+  const handleSortChange = useCallback(
+    (e: React.ChangeEvent<HTMLSelectElement>) => {
+      setSortOrder(e.target.value);
+      setCurrentPage(1);
+    },
+    [],
+  );
 
-  const handleToggleCompareMode = () => {
-    setIsCompareMode(!isCompareMode);
-    if (isCompareMode) {
-      setSelectedIds([]);
-    }
-  };
+  const handleToggleCompareMode = useCallback(() => {
+    setIsCompareMode((prev) => {
+      if (!prev) {
+        setSelectedIds([]);
+      }
+      return !prev;
+    });
+  }, []);
 
-  const handleCardToggle = (id: number) => {
+  const handleCardToggle = useCallback((id: number) => {
     setSelectedIds((prev) => {
       if (prev.includes(id)) {
         return prev.filter((p) => p !== id);
@@ -144,7 +152,7 @@ export default function PokemonListClient() {
       }
       return [...prev, id];
     });
-  };
+  }, []);
 
   const hasActiveFilter =
     !!selectedType || !!debouncedSearch || sortOrder !== "id-asc";
@@ -296,7 +304,7 @@ export default function PokemonListClient() {
           ? Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
               <PokemonCardSkeleton key={i} />
             ))
-          : pokemons.map((pokemon) => (
+          : pokemons.map((pokemon, index) => (
               <PokemonCard
                 key={pokemon.id}
                 {...pokemon}
@@ -304,6 +312,7 @@ export default function PokemonListClient() {
                 selectable={isCompareMode}
                 selected={selectedIds.includes(pokemon.id)}
                 onToggle={() => handleCardToggle(pokemon.id)}
+                priority={index < 5}
               />
             ))}
       </div>
